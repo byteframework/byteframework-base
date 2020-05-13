@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.byteframework.base.user.mapper.UserMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.byteframework.base.user.domain.User">
+		<id column="id" property="id" />
+		<result column="username" property="username" />
+		<result column="password" property="password" />
+		<result column="truename" property="truename" />
+		<result column="sex" property="sex" />
+		<result column="address" property="address" />
+		<result column="id_card" property="idCard" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="status" property="status" />
+		<result column="avatar" property="avatar" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+        id, username, password, truename, sex, address, id_card, create_time, update_time, status, avatar
+    </sql>
+
+	<!-- 查询用户的所有权限 -->
+	<select id="selectMenuByUserId" resultType="com.byteframework.base.user.domain.Permission" parameterType="long">
+		SELECT DISTINCT p.* FROM sys_user_role ur
+			LEFT JOIN sys_role_permission rp ON ur.role_id = rp.role_id
+			LEFT JOIN sys_permission p ON rp.permission_id = p.id
+		WHERE ur.user_id = #{userId}
+	</select>
+
+	<!-- 查询用户所有角色 -->
+	<select id="selectRoleByUserId" resultType="com.byteframework.base.user.domain.Role" parameterType="long">
+		SELECT sr.* FROM sys_role sr
+		LEFT JOIN sys_user_role se ON se.role_id = sr.id
+		WHERE se.user_id = #{userId}
+	</select>
+
+</mapper>
