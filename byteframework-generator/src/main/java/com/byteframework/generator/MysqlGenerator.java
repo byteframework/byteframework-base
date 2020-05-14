@@ -70,8 +70,8 @@ public class MysqlGenerator {
         dsc.setDbType(DbType.MYSQL);
         dsc.setDriverName("com.mysql.cj.jdbc.Driver");
         dsc.setUsername("myroot");
-        dsc.setPassword("sa123456");
-        dsc.setUrl("jdbc:mysql://rm-bp12m3yhq3w7mvv27ho.mysql.rds.aliyuncs.com:3306/spring-cloud?serverTimezone=UTC&useSSL=false");
+        dsc.setPassword("××××××");
+        dsc.setUrl("jdbc:mysql://rm-bp12m3yhq3w7mvv27ho.mysql.rds.aliyuncs.com:3306/permission?serverTimezone=UTC&useSSL=false");
         mpg.setDataSource(dsc);
 
         // 策略配置 skipView
