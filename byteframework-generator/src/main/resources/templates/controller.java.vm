@@ -1,0 +1,148 @@
+package ${package.Controller};
+
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import ${package.Entity}.${entity};
+import ${package.Service}.${table.serviceName};
+import com.byteframework.commons.web.BaseAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+#if(${restControllerStyle})
+import org.springframework.web.bind.annotation.RestController;
+#else
+import org.springframework.stereotype.Controller;
+#end
+#if(${superControllerClassPackage})
+import ${superControllerClassPackage};
+#end
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+/**
+ * <p>
+ * $!{table.comment} 前端控制器
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${restControllerStyle})
+@RestController
+#else
+@Controller
+#end
+@RequestMapping("#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
+#if(${kotlin})
+class ${table.controllerName}#if(${superControllerClass}) : ${superControllerClass}()#end
+
+#else
+#if(${superControllerClass})
+public class ${table.controllerName} extends ${superControllerClass} {
+#else
+public class ${table.controllerName} extends BaseAction {
+#end
+
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
+
+    #set( $length=$table.getServiceName().length() )
+    #set( $str=$table.getServiceName().substring( 1 ,$length ) )
+    #set( $first = $table.getServiceName().substring(0,1).toLowerCase() )
+    #set( $autowiredServiceName = $first + $str )
+    @Autowired
+    ${table.serviceName} $autowiredServiceName;
+
+
+    #set( $length=$entity.length() )
+    #set( $str=$entity.substring( 1 ,$length ) )
+    #set( $first = $entity.substring(0,1).toLowerCase() )
+    #set( $lowerEntity= $first + $str )
+    /**
+    * $!{table.comment} 保存数据
+    *
+    * @param request
+    * @param response
+    * @param jsonObject
+    */
+    @RequestMapping(value = "/save${entity}")
+    public void save${entity}(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject) {
+        ${entity} ${lowerEntity} = jsonObject.toJavaObject(${entity}.class);
+        try {
+            ${autowiredServiceName}.save(${lowerEntity});
+            this.responseSuccess("数据保存成功!", request, response);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            this.responseFailure("数据保存失败!", request, response);
+        }
+    }
+
+
+    /**
+     * $!{table.comment} 分页查询
+     *
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/list${entity}")
+    public void list${entity}(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject) {
+        ${entity} ${lowerEntity} = jsonObject.toJavaObject(${entity}.class);
+        IPage<${entity}> page = jsonObject.toJavaObject(Page.class);
+        Wrapper<${entity}> queryWrapper = new QueryWrapper<>(${lowerEntity});
+        try {
+            IPage<${entity}> list = ${autowiredServiceName}.page(page, queryWrapper);
+            this.responseSuccess(list, request, response);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            this.responseFailure("分页查询失败!", request, response);
+        }
+    }
+
+
+    /**
+     * $!{table.comment} 修改数据
+     *
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/update${entity}")
+    public void update${entity}(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject) {
+        ${entity} ${lowerEntity} = jsonObject.toJavaObject(${entity}.class);
+        try {
+            ${autowiredServiceName}.updateById(${lowerEntity});
+            this.responseSuccess("数据修改成功!", request, response);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            this.responseFailure("数据修改失败!", request, response);
+        }
+    }
+
+
+    /**
+     * $!{table.comment} 删除数据
+     *
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/remove${entity}")
+    public void remove${entity}(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject) {
+        ${entity} ${lowerEntity} = jsonObject.toJavaObject(${entity}.class);
+        try {
+            ${autowiredServiceName}.removeById(${lowerEntity});
+            this.responseSuccess("数据删除成功!", request, response);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            this.responseFailure("数据删除失败!", request, response);
+        }
+    }
+
+}
+
+#end
