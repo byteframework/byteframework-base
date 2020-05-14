@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @MapperScan(basePackages = {"com.byteframework.base.user.mapper"})
-public class ByteframeworkBaseUserApplication {
+public class BaseUserApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ByteframeworkBaseUserApplication.class, args);
+        SpringApplication.run(BaseUserApplication.class, args);
     }
 
 }
