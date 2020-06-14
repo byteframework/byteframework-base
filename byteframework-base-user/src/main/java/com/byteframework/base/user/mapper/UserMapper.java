@@ -1,10 +1,12 @@
 package com.byteframework.base.user.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.byteframework.base.user.domain.Permission;
 import com.byteframework.base.user.domain.Role;
 import com.byteframework.base.user.domain.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -38,5 +40,14 @@ public interface UserMapper extends BaseMapper<User> {
      * @Return List<SysMenuEntity> 角色名集合
      */
     List<Permission> selectMenuByUserId(Long userId);
+
+
+    /**
+     * 查询用户列表
+     * @param page
+     * @param user
+     * @return
+     */
+    IPage<User> listUser(IPage<User> page, @Param("user") User user);
 
 }

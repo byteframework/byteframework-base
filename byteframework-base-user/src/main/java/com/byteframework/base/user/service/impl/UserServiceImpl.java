@@ -1,6 +1,7 @@
 package com.byteframework.base.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.byteframework.base.user.domain.Permission;
 import com.byteframework.base.user.domain.Role;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -23,6 +25,9 @@ import java.util.List;
  */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService, UserDetailsService {
+
+    @Resource
+    UserMapper userMapper;
 
     /**
      * 根据用户名查询实体
@@ -79,5 +84,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 查询用户信息
         User user = this.selectUserByName(username);
         return user;
+    }
+
+
+    /**
+     * 查询用户列表
+     * @param page
+     * @param user
+     * @return
+     */
+    @Override
+    public IPage<User> listUser(IPage<User> page, User user) {
+        return userMapper.listUser(page, user);
     }
 }

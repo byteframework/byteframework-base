@@ -79,7 +79,7 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
             System.out.println("密码不正确");
         }
 
-        String pass = "123456";
+        String pass = "000000";
         BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
         String hashPass = bcryptPasswordEncoder.encode(pass);
         System.out.println(hashPass);

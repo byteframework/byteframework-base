@@ -1,19 +1,31 @@
 package com.byteframework.base.user.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.byteframework.base.user.domain.Permission;
 import com.byteframework.base.user.domain.User;
+import com.byteframework.base.user.domain.UserRole;
 import com.byteframework.base.user.service.PermissionService;
+import com.byteframework.base.user.service.UserRoleService;
+import com.byteframework.base.user.service.UserService;
 import com.byteframework.commons.web.BaseAction;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,7 +39,96 @@ import java.util.List;
 public class UserController extends BaseAction {
 
     @Autowired
-    private PermissionService permissionService;
+    UserService userService;
+
+    @Autowired
+    UserRoleService userRoleService;
+
+    @Autowired
+    PermissionService permissionService;
+
+    // 默认密码
+    private final String DEFAULT_PASSWORD = "000000";
+
+
+    /**
+     * 查询用户列表
+     *
+     * @param request
+     * @param response
+     * @param jsonObject
+     */
+    @RequestMapping(value = "/listUser")
+    public void listUser(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject) {
+        User user = jsonObject.toJavaObject(User.class);
+        IPage<User> page = jsonObject.toJavaObject(Page.class);
+        try {
+//            IPage<User> list = userService.page(page, new QueryWrapper<>(user));
+            IPage<User> list = userService.listUser(page, user);
+            this.responseSuccess(list, request, response);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            this.responseFailure("分页查询失败!", request, response);
+        }
+    }
+
+
+    /**
+     * 用户信息表 保存数据
+     *
+     * @param request
+     * @param response
+     * @param jsonObject
+     */
+    @RequestMapping(value = "/saveUser")
+    @Transactional(rollbackFor = Exception.class)
+    public void saveUser(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject) {
+        User user = jsonObject.toJavaObject(User.class);
+        try {
+            user.setCreateTime(LocalDateTime.now());
+            user.setPassword(new BCryptPasswordEncoder().encode(DEFAULT_PASSWORD));
+            userService.save(user);
+            Collection<String> roles = user.getRoles();
+
+            if(CollectionUtils.isNotEmpty(roles)){
+                for(String role : roles){
+                    UserRole userRole = new UserRole();
+                    userRole.setUserId(user.getId());
+                    userRole.setRoleId(Long.parseLong(role));
+                    userRoleService.save(userRole);
+                }
+            }
+
+            this.responseSuccess("数据保存成功!", request, response);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            this.responseFailure("数据保存失败!", request, response);
+        }
+    }
+
+    /**
+     * 用户信息表 删除数据
+     *
+     * @param request
+     * @param response
+     * @param jsonObject
+     */
+    @RequestMapping(value = "/removeUser")
+    public void removeUser(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject) {
+        User user = jsonObject.toJavaObject(User.class);
+        try {
+            userService.removeById(user);
+
+            UserRole userRole = new UserRole();
+            userRole.setUserId(user.getId());
+            userRoleService.remove(new QueryWrapper<>(userRole));
+            this.responseSuccess("数据删除成功!", request, response);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            this.responseFailure("数据删除失败!", request, response);
+        }
+    }
+
 
     /**
      * 用户端信息   {"code":20000,"data":{"roles":["admin"],"introduction":"I am a super administrator","avatar":"https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif","name":"Super Admin"}}
@@ -36,7 +137,7 @@ public class UserController extends BaseAction {
      * @CreateTime 2019/10/2 14:52
      * @Return Map<String, Object> 返回数据MAP
      */
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+//    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public void userLogin(HttpServletRequest request, HttpServletResponse response) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -58,5 +159,6 @@ public class UserController extends BaseAction {
         List<Permission> sysMenuEntityList = permissionService.list();
         this.responseSuccess(sysMenuEntityList, request, response);
     }
+
 
 }

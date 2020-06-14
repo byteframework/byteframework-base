@@ -96,6 +96,19 @@ public class User implements Serializable, UserDetails {
 	private Collection<GrantedAuthority> authorities;
 	@TableField(exist = false)
 	private Collection<String> roles;
+
+
+	/**
+	 * 用户角色名称
+	 */
+	@TableField(exist = false)
+	private String roleIds;
+	/**
+	 * 用户角色名称
+	 */
+	@TableField(exist = false)
+	private String roleNames;
+
 	/**
 	 * 账户是否过期
 	 */

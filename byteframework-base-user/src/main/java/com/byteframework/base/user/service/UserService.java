@@ -1,5 +1,6 @@
 package com.byteframework.base.user.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.byteframework.base.user.domain.Permission;
 import com.byteframework.base.user.domain.Role;
@@ -52,5 +53,14 @@ public interface UserService extends IService<User>, UserDetailsService {
 
 
     User loadUserByUsername(String username) throws UsernameNotFoundException;
+
+
+    /**
+     * 查询用户列表
+     * @param page
+     * @param user
+     * @return
+     */
+    IPage<User> listUser(IPage<User> page, User user);
 
 }
