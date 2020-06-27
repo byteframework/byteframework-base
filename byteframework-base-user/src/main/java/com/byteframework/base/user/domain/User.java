@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * <p>
@@ -99,15 +100,22 @@ public class User implements Serializable, UserDetails {
 
 
 	/**
-	 * 用户角色名称
+	 * 用户角色ID(sql查询出的是'1,2,4'这种格式)
 	 */
 	@TableField(exist = false)
 	private String roleIds;
+	/**
+	 * 用户角色ID(前端传递的是[1,2,3]这种格式)
+	 */
+	@TableField(exist = false)
+	private List<Long> userRoles;
 	/**
 	 * 用户角色名称
 	 */
 	@TableField(exist = false)
 	private String roleNames;
+
+
 
 	/**
 	 * 账户是否过期

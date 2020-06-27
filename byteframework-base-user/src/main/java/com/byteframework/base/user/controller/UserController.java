@@ -88,15 +88,15 @@ public class UserController extends BaseAction {
             user.setCreateTime(LocalDateTime.now());
             user.setPassword(new BCryptPasswordEncoder().encode(DEFAULT_PASSWORD));
             userService.save(user);
-            Collection<String> roles = user.getRoles();
-
-            if(CollectionUtils.isNotEmpty(roles)){
-                for(String role : roles){
+            // 更新用户角色
+            List<Long> userRoles = user.getUserRoles();
+            if (CollectionUtils.isNotEmpty(userRoles)) {
+                userRoles.forEach(role -> {
                     UserRole userRole = new UserRole();
                     userRole.setUserId(user.getId());
-                    userRole.setRoleId(Long.parseLong(role));
+                    userRole.setRoleId(role);
                     userRoleService.save(userRole);
-                }
+                });
             }
 
             this.responseSuccess("数据保存成功!", request, response);
@@ -105,6 +105,38 @@ public class UserController extends BaseAction {
             this.responseFailure("数据保存失败!", request, response);
         }
     }
+
+
+    /**
+     * 用户信息表 修改数据
+     *
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/updateUser", method = RequestMethod.PUT)
+    public void updateRole(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject) {
+        User user = jsonObject.toJavaObject(User.class);
+        user.setUpdateTime(LocalDateTime.now());
+        try {
+            userService.updateById(user);
+            // 更新用户角色
+            List<Long> userRoles = user.getUserRoles();
+            if (CollectionUtils.isNotEmpty(userRoles)) {
+                UserRole userRole = new UserRole();
+                userRole.setUserId(user.getId());
+                userRoleService.remove(new QueryWrapper<>(userRole));
+                userRoles.forEach(role -> {
+                    userRole.setRoleId(role);
+                    userRoleService.save(userRole);
+                });
+            }
+            this.responseSuccess("数据修改成功!", request, response);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            this.responseFailure("数据修改失败!", request, response);
+        }
+    }
+
 
     /**
      * 用户信息表 删除数据

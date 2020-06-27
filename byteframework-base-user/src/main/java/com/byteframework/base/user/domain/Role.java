@@ -60,16 +60,10 @@ public class Role implements Serializable {
 	private LocalDateTime updateTime;
 
 	/**
-	 * 临时使用
-	 */
-	@TableField(exist = false)
-	private String key= "editor";
-
-	/**
 	 * 权限信息
 	 */
 	@TableField(exist = false)
-	private List<Object> routes;
+	private List<Permission> permissions;
 
 
 }

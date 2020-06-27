@@ -1,6 +1,7 @@
 package com.byteframework.base.user.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -76,6 +78,13 @@ public class Permission implements Serializable {
 	 * 修改时间
 	 */
 	private LocalDateTime updateTime;
+
+
+	/**
+	 * 子权限
+	 */
+	@TableField(exist = false)
+	private List<Permission> children;
 
 
 }
