@@ -12,6 +12,7 @@ import com.byteframework.base.user.service.UserRoleService;
 import com.byteframework.base.user.service.UserService;
 import com.byteframework.commons.web.BaseAction;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -190,6 +190,57 @@ public class UserController extends BaseAction {
     public void sysMenuEntity(HttpServletRequest request, HttpServletResponse response) {
         List<Permission> sysMenuEntityList = permissionService.list();
         this.responseSuccess(sysMenuEntityList, request, response);
+    }
+
+
+    /**
+     * 用户信息表 修改数据
+     *
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/updatePassword", method = RequestMethod.PUT)
+    public void updatePassword(HttpServletRequest request, HttpServletResponse response, @RequestBody JSONObject jsonObject) {
+        try {
+            Long id = jsonObject.getLong("id");
+            String oldPassword = jsonObject.getString("oldPassword");
+            String newPassword = jsonObject.getString("newPassword");
+            if (null == id) {
+                this.responseFailure("用户不存在!", request, response);
+                return;
+            }
+
+            User user = new User();
+            user.setId(id);
+            user = userService.getOne(new QueryWrapper<>(user));
+            if (null == user) {
+                this.responseFailure("用户不存在!", request, response);
+                return;
+            }
+
+            // 判断原密码是否输入正确
+            boolean passwordIsRight = new BCryptPasswordEncoder().matches(oldPassword, user.getPassword());
+
+            if (!passwordIsRight) {
+                this.responseFailure("原密码不正确!", request, response);
+                return;
+            }
+
+            if (StringUtils.isEmpty(newPassword)) {
+                this.responseFailure("新密码不能为空!", request, response);
+                return;
+            }
+
+            user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+            user.setUpdateTime(LocalDateTime.now());
+
+            userService.updateById(user);
+
+            this.responseSuccess("数据修改成功!", request, response);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            this.responseFailure("数据修改失败!", request, response);
+        }
     }
 
 
