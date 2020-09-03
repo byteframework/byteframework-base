@@ -27,7 +27,7 @@ public class IndexController extends BaseAction {
      */
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public void userLogin(HttpServletRequest request, HttpServletResponse response) {
-        this.responseSuccess("这里是首页不需要权限和登录拦截", request, response);
+        this.responseSuccess(request, response, "这里是首页不需要权限和登录拦截");
     }
 
 }

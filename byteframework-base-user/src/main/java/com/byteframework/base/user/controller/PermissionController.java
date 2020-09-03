@@ -53,10 +53,10 @@ public class PermissionController extends BaseAction {
         Permission permission = jsonObject.toJavaObject(Permission.class);
         try {
             permissionService.save(permission);
-            this.responseSuccess("数据保存成功!", request, response);
+            this.responseSuccess(request, response, "数据保存成功!");
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            this.responseFailure("数据保存失败!", request, response);
+            this.responseFailure(request, response, "数据保存失败!");
         }
     }
 
@@ -75,7 +75,7 @@ public class PermissionController extends BaseAction {
             this.responseSuccess(permissions, request, response);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            this.responseFailure("查询失败!", request, response);
+            this.responseFailure(request, response, "查询失败!");
         }
     }
 
@@ -91,10 +91,10 @@ public class PermissionController extends BaseAction {
         Permission permission = jsonObject.toJavaObject(Permission.class);
         try {
             permissionService.updateById(permission);
-            this.responseSuccess("数据修改成功!", request, response);
+            this.responseSuccess(request, response, "数据修改成功!");
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            this.responseFailure("数据修改失败!", request, response);
+            this.responseFailure(request, response, "数据修改失败!");
         }
     }
 
@@ -110,10 +110,10 @@ public class PermissionController extends BaseAction {
         Permission permission = jsonObject.toJavaObject(Permission.class);
         try {
             permissionService.removeById(permission);
-            this.responseSuccess("数据删除成功!", request, response);
+            this.responseSuccess(request, response, "数据删除成功!");
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            this.responseFailure("数据删除失败!", request, response);
+            this.responseFailure(request, response, "数据删除失败!");
         }
     }
 
